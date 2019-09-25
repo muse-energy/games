@@ -277,6 +277,8 @@ function changeColor(){
 
 
 function keydownEvent(e) {
+    e.preventDefault();
+    
     var dV=0;
     var dH=0;
     if ( e.keyCode == 37 ) {//左
