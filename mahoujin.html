@@ -1,0 +1,388 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Mahoujin</title>
+    <style>
+        * { padding: 0; margin: 0;}
+        canvas { background: #eee; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+<br>
+<br>
+
+<canvas id="myCanvas" width="100" height="100"></canvas>
+<br>
+
+
+
+<script>
+var canvas = document.getElementById("myCanvas");
+var ctx = canvas.getContext("2d");
+
+
+var blockSize = 60;
+
+var boardW = 9;
+var boardH = 9;
+
+
+canvas.setAttribute("width", boardW*blockSize);
+canvas.setAttribute("height", boardH*blockSize);
+var floor = [
+[1,1,1,1,1,1,1,1,1],
+[1,2,1,0,0,0,1,3,1],
+[1,0,0,0,0,0,0,0,1],
+[1,0,1,0,0,0,1,0,1],
+[1,0,1,0,0,0,1,0,1],
+[1,0,0,0,0,0,0,0,1],
+[1,0,0,0,0,0,0,0,1],
+[1,0,0,0,4,0,0,0,1],
+[1,1,1,1,1,1,1,1,1]
+]
+
+
+
+var ground = [
+[0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0],
+[0,0,0,5,6,7,0,0,0],
+[0,0,0,0,0,0,0,0,0],
+[0,0,0,8,8,8,0,0,0],
+[0,0,0,0,1,0,0,0,0],
+[0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0]
+]
+
+
+//プレイヤーの初期位置
+var playerH = 0;
+var playerV = 0;
+
+function setPlayerPosition(){
+    for(var i=0;i<boardH;i++){
+        for(var j=0;j<boardW;j++){
+            if(ground[i][j] == 1){
+                playerH = j;
+                playerV = i;
+                return 0;
+            }
+        }
+    }
+}
+
+setPlayerPosition();
+
+function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(var i=0;i<boardH;i++){
+        for(var j=0;j<boardW;j++){
+            //床
+            if(floor[i][j] == 0){}
+            if(floor[i][j] == 1){
+                ctx.fillStyle = "#333355";
+                ctx.fillRect(j*blockSize,i*blockSize,blockSize,blockSize);
+            }
+            if(floor[i][j] == 2){//緑
+                ctx.beginPath () ;
+                ctx.arc(j*blockSize+blockSize/2,i*blockSize+blockSize/2, 3*blockSize/8, 0 * Math.PI / 180, 360 * Math.PI / 180, false ) ;
+                ctx.fillStyle = "rgba(0,128,0,0.5)" ;
+                ctx.fill() ;
+                ctx.strokeStyle = "rgba(0,128,0,0.8)" ;
+                ctx.lineWidth = 8 ;
+                ctx.stroke() ;
+            }
+            if(floor[i][j] == 3){//青
+                ctx.beginPath () ;
+                ctx.arc(j*blockSize+blockSize/2,i*blockSize+blockSize/2, 3*blockSize/8, 0 * Math.PI / 180, 360 * Math.PI / 180, false ) ;
+                ctx.fillStyle = "rgba(30,30,200,0.5)" ;
+                ctx.fill() ;
+                ctx.strokeStyle = "rgba(30,30,200,0.8)" ;
+                ctx.lineWidth = 8 ;
+                ctx.stroke() ;
+            }if(floor[i][j] == 4){//赤
+                ctx.beginPath () ;
+                ctx.arc(j*blockSize+blockSize/2,i*blockSize+blockSize/2, 3*blockSize/8, 0 * Math.PI / 180, 360 * Math.PI / 180, false ) ;
+                ctx.fillStyle = "rgba(128,0,0,0.5)" ;
+                ctx.fill() ;
+                ctx.strokeStyle = "rgba(128,0,0,0.8)" ;
+                ctx.lineWidth = 8 ;
+                ctx.stroke() ;
+            }
+            //地上
+            if(ground[i][j] == 0){}
+            if(ground[i][j] == 2){//緑石
+                ctx.fillStyle = "#009900";
+                ctx.fillRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = "#003300" ;
+                ctx.strokeRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+            }
+            if(ground[i][j] == 3){//青石
+                ctx.fillStyle = "#3333CC";
+                ctx.fillRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = "#000099" ;
+                ctx.strokeRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+            }
+            if(ground[i][j] == 4){//赤石
+                ctx.fillStyle = "#990000";
+                ctx.fillRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = "#330000" ;
+                ctx.strokeRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+            }
+            if(ground[i][j] == 8){//灰石
+                ctx.fillStyle = "#666666";
+                ctx.fillRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = "#333333" ;
+                ctx.strokeRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+            }
+
+            if(ground[i][j] == 5){//緑結晶
+                ctx.fillStyle = "#009900";
+                ctx.beginPath();
+                ctx.moveTo((j+0.5)*blockSize,(i+0.2)*blockSize);
+                ctx.lineTo((j+0.2)*blockSize,(i+0.5)*blockSize);
+                ctx.lineTo((j+0.5)*blockSize,(i+0.8)*blockSize);
+                ctx.lineTo((j+0.8)*blockSize,(i+0.5)*blockSize);
+                ctx.fill();
+            }
+            if(ground[i][j] == 6){//青結晶
+                ctx.fillStyle = "#3333CC";
+                ctx.beginPath();
+                ctx.moveTo((j+0.5)*blockSize,(i+0.2)*blockSize);
+                ctx.lineTo((j+0.2)*blockSize,(i+0.5)*blockSize);
+                ctx.lineTo((j+0.5)*blockSize,(i+0.8)*blockSize);
+                ctx.lineTo((j+0.8)*blockSize,(i+0.5)*blockSize);
+                ctx.fill();
+            }
+            if(ground[i][j] == 7){//赤結晶
+                ctx.fillStyle = "#990000";
+                ctx.beginPath();
+                ctx.moveTo((j+0.5)*blockSize,(i+0.2)*blockSize);
+                ctx.lineTo((j+0.2)*blockSize,(i+0.5)*blockSize);
+                ctx.lineTo((j+0.5)*blockSize,(i+0.8)*blockSize);
+                ctx.lineTo((j+0.8)*blockSize,(i+0.5)*blockSize);
+                ctx.fill();
+            }
+
+            if(ground[i][j] == 1){
+                ctx.beginPath () ;
+                ctx.arc(j*blockSize+blockSize/2,i*blockSize+blockSize/2, 2*blockSize/5, 0 * Math.PI / 180, 360 * Math.PI / 180, false ) ;
+                ctx.fillStyle = "#DDDDDD" ;
+                ctx.fill() ;
+                ctx.strokeStyle = "rgba(0,0,0,0.5)" ;
+                ctx.lineWidth = 3;
+                ctx.stroke() ;
+
+                ctx.fillStyle = "rgba(0,0,0,0.5)";
+                ctx.fillRect((j+0.34)*blockSize,(i+0.33)*blockSize,0.06*blockSize,0.2*blockSize);
+                ctx.fillRect((j+0.6)*blockSize,(i+0.33)*blockSize,0.06*blockSize,0.2*blockSize);
+            }
+
+        } 
+    }
+}
+
+draw();
+
+document.addEventListener("keydown", keydownEvent);
+
+var al = 0;
+function checkCleared(){
+    var cleared = 1;
+            
+    for(var i=0;i<boardH;i++){
+        for(var j=0;j<boardW;j++){
+            if(floor[i][j] == 2 && ground[i][j] != 2){
+                cleared = 0;
+            }
+            if(floor[i][j] == 3 && ground[i][j] != 3){
+                cleared = 0;
+            }
+            if(floor[i][j] == 4 && ground[i][j] != 4){
+                cleared = 0;
+            }
+        }
+    }
+    if(cleared == 1 && al == 0){
+        alert('クリア！');
+        al = 1;
+    }
+}
+
+function changeColor(){
+    for(var i=0;i<boardH;i++){
+        for(var j=0;j<boardW;j++){
+            if( (2 <= ground[i][j] && ground[i][j] <= 4) || ground[i][j] == 8){
+                var numCrystalGreen = 0;
+                var numCrystalBlue = 0;
+                var numCrystalRed = 0;
+                
+                if(ground[i][j+1]==5){
+                   numCrystalGreen += 1;
+                }
+                if(ground[i][j-1]==5){
+                   numCrystalGreen += 1;
+                }
+                if(ground[i+1][j]==5){
+                   numCrystalGreen += 1;
+                }
+                if(ground[i-1][j]==5){
+                   numCrystalGreen += 1;
+                }
+                if(ground[i][j+1]==6){
+                   numCrystalBlue += 1;
+                }
+                if(ground[i][j-1]==6){
+                   numCrystalBlue += 1;
+                }
+                if(ground[i+1][j]==6){
+                   numCrystalBlue += 1;
+                }
+                if(ground[i-1][j]==6){
+                   numCrystalBlue += 1;
+                }
+                if(ground[i][j+1]==7){
+                   numCrystalRed += 1;
+                }
+                if(ground[i][j-1]==7){
+                   numCrystalRed += 1;
+                }
+                if(ground[i+1][j]==7){
+                   numCrystalRed += 1;
+                }
+                if(ground[i-1][j]==7){
+                   numCrystalRed += 1;
+                }
+                if(numCrystalGreen >0 && numCrystalBlue ==0 && numCrystalRed == 0){
+                    ground[i][j] = 2;
+                }
+                if(numCrystalGreen ==0 && numCrystalBlue >0 && numCrystalRed == 0){
+                    ground[i][j] = 3;
+                }
+                if(numCrystalGreen ==0 && numCrystalBlue == 0 && numCrystalRed >0){
+                    ground[i][j] = 4;
+                }
+            }
+        }
+    }
+
+}
+
+
+function keydownEvent(e) {
+    var dV=0;
+    var dH=0;
+    if ( e.keyCode == 37 ) {//左
+        dV=0; dH=-1;
+    }
+    if ( e.keyCode == 38 ) {//上
+        dV=-1; dH=0;
+    }
+    if ( e.keyCode == 39 ) {//右
+        dV=0; dH=1;
+    }
+    if ( e.keyCode == 40 ) {//下
+        dV=1; dH=0;
+    }
+
+    if(floor[playerV+dV][playerH+dH]!=1){
+        if(ground[playerV+dV][playerH+dH]==2){//プレイヤーの行き先が荷物の場合
+            if(ground[playerV+2*dV][playerH+2*dH]==0 && (floor[playerV+2*dV][playerH+2*dH]!=1)){//荷物を押せる場合
+                ground[playerV][playerH] = 0;
+                ground[playerV+dV][playerH+dH] = 1;
+                ground[playerV+2*dV][playerH+2*dH] = 2;
+                playerV += dV;
+                playerH += dH;
+            }
+        }else if(ground[playerV+dV][playerH+dH]==3){//プレイヤーの行き先が荷物の場合
+            if(ground[playerV+2*dV][playerH+2*dH]==0 && (floor[playerV+2*dV][playerH+2*dH]!=1)){//荷物を押せる場合
+                ground[playerV][playerH] = 0;
+                ground[playerV+dV][playerH+dH] = 1;
+                ground[playerV+2*dV][playerH+2*dH] = 3;
+                playerV += dV;
+                playerH += dH;
+            }
+        }else if(ground[playerV+dV][playerH+dH]==4){//プレイヤーの行き先が荷物の場合
+            if(ground[playerV+2*dV][playerH+2*dH]==0 && (floor[playerV+2*dV][playerH+2*dH]!=1)){//荷物を押せる場合
+                ground[playerV][playerH] = 0;
+                ground[playerV+dV][playerH+dH] = 1;
+                ground[playerV+2*dV][playerH+2*dH] = 4;
+                playerV += dV;
+                playerH += dH;
+            }
+        }else if(ground[playerV+dV][playerH+dH]==5){//プレイヤーの行き先が荷物の場合
+            if(ground[playerV+2*dV][playerH+2*dH]==0 && (floor[playerV+2*dV][playerH+2*dH]!=1)){//荷物を押せる場合
+                ground[playerV][playerH] = 0;
+                ground[playerV+dV][playerH+dH] = 1;
+                ground[playerV+2*dV][playerH+2*dH] = 5;
+                playerV += dV;
+                playerH += dH;
+            }
+        }else if(ground[playerV+dV][playerH+dH]==6){//プレイヤーの行き先が荷物の場合
+            if(ground[playerV+2*dV][playerH+2*dH]==0 && (floor[playerV+2*dV][playerH+2*dH]!=1)){//荷物を押せる場合
+                ground[playerV][playerH] = 0;
+                ground[playerV+dV][playerH+dH] = 1;
+                ground[playerV+2*dV][playerH+2*dH] = 6;
+                playerV += dV;
+                playerH += dH;
+            }
+        }else if(ground[playerV+dV][playerH+dH]==7){//プレイヤーの行き先が荷物の場合
+            if(ground[playerV+2*dV][playerH+2*dH]==0 && (floor[playerV+2*dV][playerH+2*dH]!=1)){//荷物を押せる場合
+                ground[playerV][playerH] = 0;
+                ground[playerV+dV][playerH+dH] = 1;
+                ground[playerV+2*dV][playerH+2*dH] = 7;
+                playerV += dV;
+                playerH += dH;
+            }
+        }else if(ground[playerV+dV][playerH+dH]==8){//プレイヤーの行き先が荷物の場合
+            if(ground[playerV+2*dV][playerH+2*dH]==0 && (floor[playerV+2*dV][playerH+2*dH]!=1)){//荷物を押せる場合
+                ground[playerV][playerH] = 0;
+                ground[playerV+dV][playerH+dH] = 1;
+                ground[playerV+2*dV][playerH+2*dH] = 8;
+                playerV += dV;
+                playerH += dH;
+            }
+        }
+        else{
+            ground[playerV][playerH] = 0;
+            ground[playerV+dV][playerH+dH] = 1;
+            playerV += dV;
+            playerH += dH;
+        }
+    }
+    changeColor();
+    draw();
+    checkCleared();
+}
+
+
+</script>
+
+<div align="center">
+ルール<br>
+上下左右キーで人('')を動かすことができます。
+魔法石■とクリスタル◆は押して動かせます。<br>
+すべての魔法陣◎の上に同じ色の魔法石■を乗せてください。<br>
+クリスタル◆の隣に魔法石を置くと、魔法石■の色が変わります。<br><br>
+
+コードを書いた人：えなじ～(<a href="https://twitter.com/nablaenergy_21">@nablaenergy_21</a>)<br>
+開発にあたり、<a href="https://developer.mozilla.org/ja/docs/Games/Workflows/2D_Breakout_game_pure_JavaScript">
+MDN web docs - そのままのJavaScriptを使ったブロックくずしゲーム</a>を参考にさせていただきました。
+</div>
+
+
+
+
+<script>
+
+</script>
+
+</body>
+</html>
