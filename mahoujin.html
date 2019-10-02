@@ -24,12 +24,35 @@ var ctx = canvas.getContext("2d");
 
 var blockSize = 60;
 
+
+
+
+
+var query = window.location.search;
+
+if(query != ''){
+    query = query.replace("?", "");
+    queries = query.split("&")
+    boardW = parseInt(queries[0].replace("w=", ""))
+    boardH = parseInt(queries[1].replace("h=", ""))
+    var floor = new Array(boardH);
+    var ground = new Array(boardH);
+    for(var i=0; i<boardW; i++){
+        floor[i] = new Array(boardW);
+        ground[i] = new Array(boardW);
+    }
+    pos = 2;
+    for(var i=0; i<boardW; i++){
+        for(var j=0;j<boardH;j++){
+            floor[i][j] = parseInt(queries[2].slice(pos,pos+1));
+            ground[i][j] = parseInt(queries[3].slice(pos,pos+1));
+            pos++;
+        }
+    }
+}else{
 var boardW = 9;
 var boardH = 9;
 
-
-canvas.setAttribute("width", boardW*blockSize);
-canvas.setAttribute("height", boardH*blockSize);
 var floor = [
 [1,1,1,1,1,1,1,1,1],
 [1,2,1,0,0,0,1,3,1],
@@ -56,6 +79,9 @@ var ground = [
 [0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0]
 ]
+}
+canvas.setAttribute("width", boardW*blockSize);
+canvas.setAttribute("height", boardH*blockSize);
 
 
 //プレイヤーの初期位置
