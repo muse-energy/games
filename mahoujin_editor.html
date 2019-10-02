@@ -1,0 +1,554 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Mahoujin</title>
+    <style>
+        * { padding: 0; margin: 0;}
+        canvas { background: #eee; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+<br>
+<br>
+
+
+<canvas id="palette" width="100" height="100"></canvas><br>
+<canvas id="myCanvas" width="100" height="100"></canvas>
+<br>
+
+
+
+<script>
+var canvas = document.getElementById("myCanvas");
+var ctxMap = canvas.getContext("2d");
+
+var blockSize = 60;
+
+var boardWMap = 9;
+var boardHMap = 9;
+
+canvas.setAttribute("width", boardWMap*blockSize);
+canvas.setAttribute("height", boardHMap*blockSize);
+
+//パレットの設定
+var palette = document.getElementById("palette");
+var ctxPalette = palette.getContext("2d");
+
+palette.setAttribute("width", 9*blockSize);
+palette.setAttribute("height", 2*blockSize);
+
+var floorPalette = [
+[0,1,2,3,4,0,0,0,0],
+[0,0,0,0,0,0,0,0,0]
+]
+var groundPalette = [
+[0,0,0,0,0,0,0,0,0],
+[0,0,2,3,4,5,6,7,8]
+]
+
+var floorMap = [
+[1,1,1,1,1,1,1,1,1],
+[1,2,1,0,0,0,1,3,1],
+[1,0,0,0,0,0,0,0,1],
+[1,0,1,0,0,0,1,0,1],
+[1,0,1,0,0,0,1,0,1],
+[1,0,0,0,0,0,0,0,1],
+[1,0,0,0,0,0,0,0,1],
+[1,0,0,0,4,0,0,0,1],
+[1,1,1,1,1,1,1,1,1]
+]
+
+
+
+var groundMap = [
+[0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0],
+[0,0,0,5,6,7,0,0,0],
+[0,0,0,0,0,0,0,0,0],
+[0,0,0,8,8,8,0,0,0],
+[0,0,0,0,1,0,0,0,0],
+[0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0]
+]
+
+
+//プレイヤーの初期位置
+var playerH = 0;
+var playerV = 0;
+
+function setPlayerPosition(){
+    for(var i=0;i<boardHMap;i++){
+        for(var j=0;j<boardWMap;j++){
+            if(groundMap[i][j] == 1){
+                playerH = j;
+                playerV = i;
+                return 0;
+            }
+        }
+    }
+}
+
+setPlayerPosition();
+
+function draw(ctx, floor, ground, boardH, boardW){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(var i=0;i<boardH;i++){
+        for(var j=0;j<boardW;j++){
+            //床
+            if(floor[i][j] == 0){}
+            if(floor[i][j] == 1){
+                ctx.fillStyle = "#333355";
+                ctx.fillRect(j*blockSize,i*blockSize,blockSize,blockSize);
+            }
+            if(floor[i][j] == 2){//緑
+                ctx.beginPath () ;
+                ctx.arc(j*blockSize+blockSize/2,i*blockSize+blockSize/2, 3*blockSize/8, 0 * Math.PI / 180, 360 * Math.PI / 180, false ) ;
+                ctx.fillStyle = "rgba(0,128,0,0.5)" ;
+                ctx.fill() ;
+                ctx.strokeStyle = "rgba(0,128,0,0.8)" ;
+                ctx.lineWidth = 8 ;
+                ctx.stroke() ;
+            }
+            if(floor[i][j] == 3){//青
+                ctx.beginPath () ;
+                ctx.arc(j*blockSize+blockSize/2,i*blockSize+blockSize/2, 3*blockSize/8, 0 * Math.PI / 180, 360 * Math.PI / 180, false ) ;
+                ctx.fillStyle = "rgba(30,30,200,0.5)" ;
+                ctx.fill() ;
+                ctx.strokeStyle = "rgba(30,30,200,0.8)" ;
+                ctx.lineWidth = 8 ;
+                ctx.stroke() ;
+            }if(floor[i][j] == 4){//赤
+                ctx.beginPath () ;
+                ctx.arc(j*blockSize+blockSize/2,i*blockSize+blockSize/2, 3*blockSize/8, 0 * Math.PI / 180, 360 * Math.PI / 180, false ) ;
+                ctx.fillStyle = "rgba(128,0,0,0.5)" ;
+                ctx.fill() ;
+                ctx.strokeStyle = "rgba(128,0,0,0.8)" ;
+                ctx.lineWidth = 8 ;
+                ctx.stroke() ;
+            }
+            //地上
+            if(ground[i][j] == 0){}
+            if(ground[i][j] == 2){//緑石
+                ctx.fillStyle = "#009900";
+                ctx.fillRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = "#003300" ;
+                ctx.strokeRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+            }
+            if(ground[i][j] == 3){//青石
+                ctx.fillStyle = "#3333CC";
+                ctx.fillRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = "#000099" ;
+                ctx.strokeRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+            }
+            if(ground[i][j] == 4){//赤石
+                ctx.fillStyle = "#990000";
+                ctx.fillRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = "#330000" ;
+                ctx.strokeRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+            }
+            if(ground[i][j] == 8){//灰石
+                ctx.fillStyle = "#666666";
+                ctx.fillRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = "#333333" ;
+                ctx.strokeRect((j+0.2)*blockSize,(i+0.2)*blockSize,0.6*blockSize,0.6*blockSize);
+            }
+
+            if(ground[i][j] == 5){//緑結晶
+                ctx.fillStyle = "#009900";
+                ctx.beginPath();
+                ctx.moveTo((j+0.5)*blockSize,(i+0.2)*blockSize);
+                ctx.lineTo((j+0.2)*blockSize,(i+0.5)*blockSize);
+                ctx.lineTo((j+0.5)*blockSize,(i+0.8)*blockSize);
+                ctx.lineTo((j+0.8)*blockSize,(i+0.5)*blockSize);
+                ctx.fill();
+            }
+            if(ground[i][j] == 6){//青結晶
+                ctx.fillStyle = "#3333CC";
+                ctx.beginPath();
+                ctx.moveTo((j+0.5)*blockSize,(i+0.2)*blockSize);
+                ctx.lineTo((j+0.2)*blockSize,(i+0.5)*blockSize);
+                ctx.lineTo((j+0.5)*blockSize,(i+0.8)*blockSize);
+                ctx.lineTo((j+0.8)*blockSize,(i+0.5)*blockSize);
+                ctx.fill();
+            }
+            if(ground[i][j] == 7){//赤結晶
+                ctx.fillStyle = "#990000";
+                ctx.beginPath();
+                ctx.moveTo((j+0.5)*blockSize,(i+0.2)*blockSize);
+                ctx.lineTo((j+0.2)*blockSize,(i+0.5)*blockSize);
+                ctx.lineTo((j+0.5)*blockSize,(i+0.8)*blockSize);
+                ctx.lineTo((j+0.8)*blockSize,(i+0.5)*blockSize);
+                ctx.fill();
+            }
+
+            if(ground[i][j] == 1){
+                ctx.beginPath () ;
+                ctx.arc(j*blockSize+blockSize/2,i*blockSize+blockSize/2, 2*blockSize/5, 0 * Math.PI / 180, 360 * Math.PI / 180, false ) ;
+                ctx.fillStyle = "#DDDDDD" ;
+                ctx.fill() ;
+                ctx.strokeStyle = "rgba(0,0,0,0.5)" ;
+                ctx.lineWidth = 3;
+                ctx.stroke() ;
+
+                ctx.fillStyle = "rgba(0,0,0,0.5)";
+                ctx.fillRect((j+0.34)*blockSize,(i+0.33)*blockSize,0.06*blockSize,0.2*blockSize);
+                ctx.fillRect((j+0.6)*blockSize,(i+0.33)*blockSize,0.06*blockSize,0.2*blockSize);
+            }
+
+        } 
+    }
+}
+
+draw(ctxMap, floorMap, groundMap, boardHMap, boardWMap);
+draw(ctxPalette, floorPalette, groundPalette, 2, 9);
+
+document.addEventListener("keydown", keydownEvent);
+
+
+function checkCleared(){
+    var clearCheckBox = document.c.clearCheck;
+
+    if(clearCheckBox.checked){
+        console.log("asdasd")
+        var cleared = 1;
+            
+        for(var i=0;i<boardHMap;i++){
+            for(var j=0;j<boardWMap;j++){
+                if(floorMap[i][j] == 2 && groundMap[i][j] != 2){
+                    cleared = 0;
+                }
+                if(floorMap[i][j] == 3 && groundMap[i][j] != 3){
+                    cleared = 0;
+                }
+                if(floorMap[i][j] == 4 && groundMap[i][j] != 4){
+                    cleared = 0;
+                }
+            }
+        }
+        if(cleared == 1){
+            alert('クリア！');
+            clearCheckBox.checked = false;
+        }
+    }
+}
+
+function changeColor(){
+    for(var i=0;i<boardHMap;i++){
+        for(var j=0;j<boardWMap;j++){
+            if( (2 <= groundMap[i][j] && groundMap[i][j] <= 4) || groundMap[i][j] == 8){
+                var numCrystalGreen = 0;
+                var numCrystalBlue = 0;
+                var numCrystalRed = 0;
+                
+                if(groundMap[i][j+1]==5){
+                   numCrystalGreen += 1;
+                }
+                if(groundMap[i][j-1]==5){
+                   numCrystalGreen += 1;
+                }
+                if(groundMap[i+1][j]==5){
+                   numCrystalGreen += 1;
+                }
+                if(groundMap[i-1][j]==5){
+                   numCrystalGreen += 1;
+                }
+                if(groundMap[i][j+1]==6){
+                   numCrystalBlue += 1;
+                }
+                if(groundMap[i][j-1]==6){
+                   numCrystalBlue += 1;
+                }
+                if(groundMap[i+1][j]==6){
+                   numCrystalBlue += 1;
+                }
+                if(groundMap[i-1][j]==6){
+                   numCrystalBlue += 1;
+                }
+                if(groundMap[i][j+1]==7){
+                   numCrystalRed += 1;
+                }
+                if(groundMap[i][j-1]==7){
+                   numCrystalRed += 1;
+                }
+                if(groundMap[i+1][j]==7){
+                   numCrystalRed += 1;
+                }
+                if(groundMap[i-1][j]==7){
+                   numCrystalRed += 1;
+                }
+                if(numCrystalGreen >0 && numCrystalBlue ==0 && numCrystalRed == 0){
+                    groundMap[i][j] = 2;
+                }
+                if(numCrystalGreen ==0 && numCrystalBlue >0 && numCrystalRed == 0){
+                    groundMap[i][j] = 3;
+                }
+                if(numCrystalGreen ==0 && numCrystalBlue == 0 && numCrystalRed >0){
+                    groundMap[i][j] = 4;
+                }
+            }
+        }
+    }
+
+}
+
+
+function keydownEvent(e) {
+    e.preventDefault();
+    
+    var dV=0;
+    var dH=0;
+    if ( e.keyCode == 37 ) {//左
+        dV=0; dH=-1;
+    }
+    if ( e.keyCode == 38 ) {//上
+        dV=-1; dH=0;
+    }
+    if ( e.keyCode == 39 ) {//右
+        dV=0; dH=1;
+    }
+    if ( e.keyCode == 40 ) {//下
+        dV=1; dH=0;
+    }
+
+    if(floorMap[playerV+dV][playerH+dH]!=1){
+        if(groundMap[playerV+dV][playerH+dH]==2){//プレイヤーの行き先が荷物の場合
+            if(groundMap[playerV+2*dV][playerH+2*dH]==0 && (floorMap[playerV+2*dV][playerH+2*dH]!=1)){//荷物を押せる場合
+                groundMap[playerV][playerH] = 0;
+                groundMap[playerV+dV][playerH+dH] = 1;
+                groundMap[playerV+2*dV][playerH+2*dH] = 2;
+                playerV += dV;
+                playerH += dH;
+            }
+        }else if(groundMap[playerV+dV][playerH+dH]==3){//プレイヤーの行き先が荷物の場合
+            if(groundMap[playerV+2*dV][playerH+2*dH]==0 && (floorMap[playerV+2*dV][playerH+2*dH]!=1)){//荷物を押せる場合
+                groundMap[playerV][playerH] = 0;
+                groundMap[playerV+dV][playerH+dH] = 1;
+                groundMap[playerV+2*dV][playerH+2*dH] = 3;
+                playerV += dV;
+                playerH += dH;
+            }
+        }else if(groundMap[playerV+dV][playerH+dH]==4){//プレイヤーの行き先が荷物の場合
+            if(groundMap[playerV+2*dV][playerH+2*dH]==0 && (floorMap[playerV+2*dV][playerH+2*dH]!=1)){//荷物を押せる場合
+                groundMap[playerV][playerH] = 0;
+                groundMap[playerV+dV][playerH+dH] = 1;
+                groundMap[playerV+2*dV][playerH+2*dH] = 4;
+                playerV += dV;
+                playerH += dH;
+            }
+        }else if(groundMap[playerV+dV][playerH+dH]==5){//プレイヤーの行き先が荷物の場合
+            if(groundMap[playerV+2*dV][playerH+2*dH]==0 && (floorMap[playerV+2*dV][playerH+2*dH]!=1)){//荷物を押せる場合
+                groundMap[playerV][playerH] = 0;
+                groundMap[playerV+dV][playerH+dH] = 1;
+                groundMap[playerV+2*dV][playerH+2*dH] = 5;
+                playerV += dV;
+                playerH += dH;
+            }
+        }else if(groundMap[playerV+dV][playerH+dH]==6){//プレイヤーの行き先が荷物の場合
+            if(groundMap[playerV+2*dV][playerH+2*dH]==0 && (floorMap[playerV+2*dV][playerH+2*dH]!=1)){//荷物を押せる場合
+                groundMap[playerV][playerH] = 0;
+                groundMap[playerV+dV][playerH+dH] = 1;
+                groundMap[playerV+2*dV][playerH+2*dH] = 6;
+                playerV += dV;
+                playerH += dH;
+            }
+        }else if(groundMap[playerV+dV][playerH+dH]==7){//プレイヤーの行き先が荷物の場合
+            if(groundMap[playerV+2*dV][playerH+2*dH]==0 && (floorMap[playerV+2*dV][playerH+2*dH]!=1)){//荷物を押せる場合
+                groundMap[playerV][playerH] = 0;
+                groundMap[playerV+dV][playerH+dH] = 1;
+                groundMap[playerV+2*dV][playerH+2*dH] = 7;
+                playerV += dV;
+                playerH += dH;
+            }
+        }else if(groundMap[playerV+dV][playerH+dH]==8){//プレイヤーの行き先が荷物の場合
+            if(groundMap[playerV+2*dV][playerH+2*dH]==0 && (floorMap[playerV+2*dV][playerH+2*dH]!=1)){//荷物を押せる場合
+                groundMap[playerV][playerH] = 0;
+                groundMap[playerV+dV][playerH+dH] = 1;
+                groundMap[playerV+2*dV][playerH+2*dH] = 8;
+                playerV += dV;
+                playerH += dH;
+            }
+        }
+        else{
+            groundMap[playerV][playerH] = 0;
+            groundMap[playerV+dV][playerH+dH] = 1;
+            playerV += dV;
+            playerH += dH;
+        }
+    }
+    changeColor();
+    draw(ctxMap, floorMap, groundMap, boardHMap, boardWMap);
+    checkCleared();
+}
+
+var selectedRow = 0;
+var selectedColumn = 0;
+
+palette.addEventListener("click", clickHandlerPalette);
+
+function clickHandlerPalette(e){
+    var clickX = e.pageX;
+    var clickY = e.pageY;
+
+    // 要素の位置を取得
+    var clientRect = this.getBoundingClientRect() ;
+    var positionX = clientRect.left + window.pageXOffset ;
+    var positionY = clientRect.top + window.pageYOffset ;
+
+    // 要素内におけるクリック位置を計算
+    selectedColumn = Math.floor((clickX - positionX) / blockSize);
+    selectedRow = Math.floor((clickY - positionY) / blockSize);
+
+    draw(ctxPalette, floorPalette, groundPalette, 2, 9);
+    drawSelected();
+}
+
+function drawSelected(){
+    ctxPalette.lineWidth = 8;
+    ctxPalette.strokeStyle = "#CC9922";
+    ctxPalette.strokeRect(4+selectedColumn*blockSize,4+selectedRow*blockSize,blockSize-8,blockSize-8);
+}
+
+
+canvas.addEventListener("click", clickHandlerMap);
+
+function clickHandlerMap(e){
+    var clickX = e.pageX;
+    var clickY = e.pageY;
+
+    // 要素の位置を取得
+    var clientRect = this.getBoundingClientRect() ;
+    var positionX = clientRect.left + window.pageXOffset ;
+    var positionY = clientRect.top + window.pageYOffset ;
+
+    // 要素内におけるクリック位置を計算
+    var clickedRow = Math.floor((clickX - positionX) / blockSize);
+    var clickedColumn = Math.floor((clickY - positionY) / blockSize);
+
+    if(selectedRow == 0){
+        if(0 < clickedRow && clickedRow < boardHMap-1 && 0 < clickedColumn && clickedColumn < boardWMap){
+            if(1<=selectedColumn && selectedColumn <= 4){
+                floorMap[clickedColumn][clickedRow] = selectedColumn;
+            }
+            else{
+                floorMap[clickedColumn][clickedRow] = 0;
+                groundMap[clickedColumn][clickedRow] = 0;
+            }
+        }
+    }
+    if(selectedRow == 1){
+        if(0 < clickedRow && clickedRow < boardHMap-1 && 0 < clickedColumn && clickedColumn < boardWMap -1){
+            if(selectedColumn == 0){floorMap[clickedColumn][clickedRow] = 0;}
+            else if(selectedColumn == 1){
+                floorMap[clickedColumn][clickedRow] = 0;
+               groundMap[clickedColumn][clickedRow] = 0;
+            }
+            else{groundMap[clickedColumn][clickedRow] = selectedColumn;}
+        }
+    }
+    draw(ctxMap, floorMap, groundMap, boardHMap, boardWMap);
+
+}
+
+var floorLast = new Array(boardHMap);
+var groundLast = new Array(boardHMap);
+
+for(var i=0;i<boardHMap;i++){
+    floorLast[i] = new Array(boardWMap);
+    groundLast[i] = new Array(boardWMap);
+    for(var j=0;j<boardWMap;j++){
+        floorLast[i][j] = floorMap[i][j];
+        groundLast[i][j] = groundMap[i][j];  
+    }
+}
+
+function saveMap(){
+    for(var i=0;i<boardHMap;i++){
+        for(var j=0;j<boardWMap;j++){
+            floorLast[i][j] = floorMap[i][j];
+            groundLast[i][j] = groundMap[i][j];  
+        }
+    }
+}
+
+function resetMap(){
+    for(var i=0;i<boardHMap;i++){
+        for(var j=0;j<boardWMap;j++){
+            floorMap[i][j] = floorLast[i][j];
+            groundMap[i][j] = groundLast[i][j];  
+        }
+    }
+    setPlayerPosition();
+    draw(ctxMap, floorMap, groundMap, boardHMap, boardWMap);    
+}
+
+function exportMap(){
+    var tBox = document.getElementById("export");
+    exportText = "https://nablaenergy.github.io/games/mahoujin.html";
+    exportText += "?w=";
+    exportText += String(boardWMap);
+    exportText += "&h=";
+    exportText += String(boardHMap);
+    exportText += "&f=";
+    for(var i=0;i<boardHMap;i++){
+        for(var j=0;j<boardWMap;j++){
+            exportText += String(floorMap[i][j]);
+        }
+    }
+    exportText += "&g=";
+    for(var i=0;i<boardHMap;i++){
+        for(var j=0;j<boardWMap;j++){
+            exportText += String(groundMap[i][j]);
+        }
+    }
+    tBox.value = exportText;
+}
+
+</script>
+
+<div align="center">
+<input type="button" value="保存" onclick="saveMap();" style="width: 100px; height:100px; margin-right: 2em;"/>
+<input type="button" value="リセット" onclick="resetMap();" style="width: 100px; height:100px; margin-right: 2em;"/>
+<input type="button" value="書き出し" onclick="exportMap();" style="width: 100px; height:100px;"/><br><br>
+<form name="c">
+<input type="checkbox" name="clearCheck" value="clearCheck" /> クリア判定を行う<br>
+<input type="text" id="export" value="URL" />
+</form>
+「書き出し」を押すと、↑ここにURLが表示されます。<br>
+(キーボードが効かない設定なので右クリックで全選択→コピーをお願いします。そのうちどうにかします…。)
+<br>
+
+<br>
+
+<b>エディターの使い方</b><br>
+上のパレットから配置したいオブジェクトをクリックして選び、マップをクリックすると配置できます。<br>
+パレットの何もないマスで消去できます。<br>
+外周には今のところ何も配置できません。<br>
+マップのサイズも今のところ変えられません(そのうちどうにかしたい)。<br>
+<br>
+<b>ゲームのルール</b><br>
+上下左右キーで人('')を動かすことができます。
+魔法石■とクリスタル◆は押して動かせます。<br>
+すべての魔法陣◎の上に同じ色の魔法石■を乗せてください。<br>
+クリスタル◆の隣に魔法石を置くと、魔法石■の色が変わります。<br><br>
+
+コードを書いた人：えなじ～(<a href="https://twitter.com/nablaenergy_21">@nablaenergy_21</a>)<br>
+開発にあたり、<a href="https://developer.mozilla.org/ja/docs/Games/Workflows/2D_Breakout_game_pure_JavaScript">
+MDN web docs - そのままのJavaScriptを使ったブロックくずしゲーム</a>を参考にさせていただきました。
+</div>
+
+
+
+
+<script>
+
+</script>
+
+</body>
+</html>
