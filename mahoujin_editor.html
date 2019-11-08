@@ -444,8 +444,7 @@ function clickHandlerMap(e){
     }
     if(selectedRow == 1){
         if(0 < clickedRow && clickedRow < boardHMap-1 && 0 < clickedColumn && clickedColumn < boardWMap -1){
-            if(selectedColumn == 0){floorMap[clickedColumn][clickedRow] = 0;}
-            else if(selectedColumn == 1){
+            if(selectedColumn == 0 || selectedColumn == 1){
                 floorMap[clickedColumn][clickedRow] = 0;
                groundMap[clickedColumn][clickedRow] = 0;
             }
